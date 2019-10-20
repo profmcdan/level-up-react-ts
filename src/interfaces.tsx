@@ -23,10 +23,18 @@ export interface IEpisode {
 
 export interface IState {
   episodes: Array<IEpisode>;
-  favorites: Array<any>;
+  favorites: Array<IEpisode>;
+  episode: object;
 }
 
 export interface IAction {
   type: string;
   payload: any;
+}
+
+export interface IEpisodeProps {
+  episodes: Array<IEpisode>;
+  favorites: Array<IEpisode>;
+  toggleFavAction: (episode: IEpisode) => IAction;
+  fetchDataAction: () => {};
 }

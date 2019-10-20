@@ -1,74 +1,30 @@
-import * as React from 'react';
+import React, { Fragment } from 'react';
+import { Route, BrowserRouter as Router } from 'react-router-dom';
 import { Store } from './Store';
-import { IEpisode, IAction } from './interfaces';
+import Header from './components/Header';
+import EpisodeDetails from './components/EpisodeDetails';
+import FavoriteList from './components/FavoriteList';
+
+const EpisodeList = React.lazy(() => import('./components/EpisodeList'));
 
 // import axios from 'axios';
 
-const URL: string =
-  'https://api.tvmaze.com/singlesearch/shows?q=rick-&-morty&embed=episodes';
-
 const App: React.FC = () => {
-  const { state, dispatch } = React.useContext(Store);
-
-  React.useEffect(() => {
-    state.episodes.length === 0 && fetchDataAction();
-  }, []);
-
-  const fetchDataAction = async () => {
-    const response = await fetch(URL);
-    const { _embedded } = await response.json();
-    // console.log(_embedded.episodes);
-    return dispatch({
-      type: 'FETCH_DATA',
-      payload: _embedded.episodes,
-    });
-  };
-
-  const toggleFavAction = (episode: IEpisode): IAction => {
-    const episodeInFav = state.favorites.includes(episode);
-    if (episodeInFav) {
-      const newFavorites = state.favorites.filter(
-        (fav: IEpisode) => fav.id !== episode.id,
-      );
-      return dispatch({
-        type: 'REMOVE_FAV',
-        payload: newFavorites,
-      });
-    } else {
-      return dispatch({
-        type: 'ADD_FAV',
-        payload: episode,
-      });
-    }
-  };
+  const { state } = React.useContext(Store);
 
   return (
-    <React.Fragment>
-      {console.log(state)}
-      <header className="header">
-        <h1>Rick and Morty</h1>
-        <p>Pick your favorite episode!!!</p>
-      </header>
+    <Router>
+      <Fragment>
+        {console.log(state)}
+        <Header favorites={state.favorites} />
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <Route exact component={EpisodeList} path="/" />
+          <Route exact component={EpisodeDetails} path="/episode/:id" />
+        </React.Suspense>
 
-      <section className="episode-layout">
-        {state.episodes.map((episode: IEpisode) => (
-          <section key={episode.id} className="episode-box">
-            {episode.image && (
-              <img src={episode.image.medium} alt={episode.name} />
-            )}
-            <div>{episode.name}</div>
-            <section>
-              <div>
-                Season: {episode.season} Number: {episode.number}
-              </div>
-              <button type="button" onClick={() => toggleFavAction(episode)}>
-                Fav
-              </button>
-            </section>
-          </section>
-        ))}
-      </section>
-    </React.Fragment>
+        <Route exact component={FavoriteList} path="/favorites" />
+      </Fragment>
+    </Router>
   );
 };
 

@@ -1,9 +1,10 @@
 import React, { createContext, useReducer } from 'react';
-import { IState, IAction } from './interfaces';
+import { IState, IAction, IEpisode } from './interfaces';
 
 const initialState: IState = {
   episodes: [],
   favorites: [],
+  episode: {},
 };
 
 export const Store = createContext<IState | any>(initialState);
@@ -16,6 +17,8 @@ export const reducer = (state: IState, action: IAction): IState => {
       return { ...state, favorites: [...state.favorites, action.payload] };
     case 'REMOVE_FAV':
       return { ...state, favorites: action.payload };
+    case 'GET_ONE_EPISODE':
+      return { ...state, episode: action.payload };
     default:
       return state;
   }
